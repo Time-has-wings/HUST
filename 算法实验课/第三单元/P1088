@@ -1,0 +1,51 @@
+// P1088
+// Created by LINwhy on 2022/11/16
+// Time 23:59
+#include<iostream>
+#include<algorithm>
+using namespace std;
+int r, c;
+int h[105][105];
+struct node {
+	int x, y, h;
+}a[10005];
+bool cmp(node a,node b){
+	return a.h > b.h;
+}
+int cnt;
+int dp[105][105];
+int dx[] = { 1,-1,0,0 }, dy[] = { 0,0,1,-1 };
+bool in(int x, int y) {
+	if (1 <= x && x <= r && 1 <= y && y <= c) return true;
+	return false;
+}
+int main() {
+	cin >> r >> c;
+	for (int i = 1; i <= r; i++) {
+		for (int j = 1; j <= c; j++) {
+			cin >> h[i][j];
+			a[++cnt].x = i;
+			a[cnt].y = j;
+			a[cnt].h = h[i][j];
+			dp[i][j] = 1;
+		}
+	}
+	sort(a + 1, a + 1 + cnt, cmp);
+	for (int i = 1; i <= cnt; i++) {
+		for (int j = 0; j <= 3; j++) {
+			if (in(a[i].x + dx[j], a[i].y + dy[j])) {
+				if (h[a[i].x + dx[j]][a[i].y + dy[j]] > h[a[i].x][a[i].y]) {
+					dp[a[i].x][a[i].y] = max(dp[a[i].x][a[i].y], dp[a[i].x + dx[j]][a[i].y + dy[j]] + 1);
+				}
+			}
+		}
+	}
+	int ans = 0;
+	for (int i = 1; i <= r; i++) {
+		for (int j = 1; j <= c; j++) {
+			ans = max(dp[i][j] ,ans);
+		}
+	}
+	cout << ans;
+	return 0;
+}
