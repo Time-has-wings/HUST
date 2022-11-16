@@ -1,0 +1,85 @@
+// P1185
+// Created by LINwhy on 2022/11/16
+// Time 23:59
+// 标签： 提高+/省选  状态压缩DP
+#include<iostream>
+#include<vector>
+using namespace std;
+const int N = 105, M = 15;
+int n, m;
+int a[N][M];
+vector<int>state[N];
+vector<int>cnt[N];
+int f[N][1 << 10][1 << 10]; //f[i,j,k] 前i行， i-1行为状态j， i行状态为k
+bool check(int pos, int state) {
+	//判断是否是平地
+	for (int i = 0; i < m; i++)
+		if ((state >> i) & 1 && a[pos][i + 1] == 0)
+			return false;
+	//判断是否有相邻或者相差2的阵地
+	for (int i = 0; i < m; i++)
+		if ((state >> i) & 1 && ((state >> i + 1) & 1 || (state >> i + 2) & 1))
+			return false;
+	return true;
+}
+int count(int state) {
+	int res = 0;
+	for (int i = 0; i < m; i++)
+		if (state >> i & 1) res++;
+	return res;
+}
+int main() {
+	cin >> n >> m;
+	for(int i = 1;i <= n; i++)
+		for (int j = 1; j <= m; j++) {
+			char ch; cin >> ch;
+			a[i][j] = ch == 'P' ? 1 : 0;
+		} 
+	//预处理每行状态
+	for(int i = 1;i <= n;i++)
+		for(int j = 0;j < 1 << m; j++)
+			if (check(i, j)) {
+				state[i].push_back(j);
+				cnt[i].push_back(count(j));
+			}
+	//增添一行
+	state[n + 1].push_back(0);
+	cnt[n + 1].push_back(0);
+	//处理一行
+	for (int i = 0; i < state[1].size(); i++)
+		f[1][0][i] = cnt[1][i];
+	for (int i = 0; i < state[2].size(); i++) {
+		//枚举上一行
+		int a = state[2][i];//当前状态
+		for (int j = 0; j < state[1].size(); j++) {
+			int b = state[1][j];//第一行的状态
+			if ((a & b) == 0) {
+				//可从状态b转移到状态a
+				f[2][j][i] = max(f[2][j][i], f[1][0][j] + cnt[2][i]);
+			}
+		}
+	}
+	//处理其余行
+	for (int i = 3; i <= n + 1; i++) {
+		for (int j = 0; j < state[i].size(); j++) {
+			int a = state[i][j];//当前1状态
+			//枚举上两行
+			for (int k = 0; k < state[i - 1].size(); k++) {
+				int b = state[i - 1][k];
+				if ((a & b) == 0) {
+					for (int l = 0; l < state[i - 2].size(); l++) {
+						int c = state[i - 2][l];
+						if ((a & c) == 0 && (b & c) == 0) {
+							f[i][k][j] = max(f[i][k][j], f[i - 1][l][k] + cnt[i][j]);
+						}
+					}
+				}
+			}
+		}
+	}
+	int ans = 0;
+	for (int i = 0; i < state[n].size(); i++)
+		ans = max(ans, f[n + 1][i][0]);
+	cout << ans;
+	return 0;
+}
