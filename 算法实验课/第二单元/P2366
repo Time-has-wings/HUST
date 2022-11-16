@@ -1,0 +1,26 @@
+// P2366
+// Created by LINwhy on 2022/11/16
+// Time 23:55
+#include<iostream>
+#include<set>
+using namespace std;
+set<int>has;
+int main(){
+	int n;
+	scanf("%d",&n);
+	for(int i=1;i<=n;i++){
+		int x;
+		scanf("%d",&x);
+		has.insert(10000-x);
+	}
+	scanf("%d",&n);
+	int flag=0;
+	for(int i=1;i<=n;i++){
+		int x;
+		scanf("%d",&x);
+		if(has.count(x)) flag=1;
+	}
+	if(flag) cout<<"YES";
+	else cout<<"NO";
+	return 0;
+} 
