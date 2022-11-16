@@ -1,0 +1,23 @@
+// P1005
+// Create by LINwhy on 2022/11/16 23:51
+#include<iostream>
+#include<cmath>
+using namespace std;
+#define PI acos(-1)
+int T, cnt;
+double x, y, dis, area;
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> T;
+	while (T--) {
+		cnt++;
+		cin >> x >> y;
+		dis = sqrt(pow(x, 2) + pow(y, 2));
+		area = PI * dis * dis / 2;
+		int ans = ceil(area / 50);
+		printf("Property %d: This property will begin eroding in year %d.\n", cnt, ans);
+	}
+	puts("END OF OUTPUT.");
+	return 0;
+}
