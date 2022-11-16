@@ -1,0 +1,35 @@
+// P1050
+// Created by LINwhy on 2022/11/16
+// Time 23:58
+#include<iostream>
+using namespace std;
+int pre[105][105];
+int a[105][105];
+int n;
+int ans;
+int dp[105], res[105];
+inline int DP() {
+	res[1] = dp[1];
+	int MAX = 0;
+	for (int i = 2; i <= n; i++) {
+		res[i] = max(res[i - 1] + dp[i], dp[i]);
+		MAX = max(MAX, res[i]);
+	}
+	return MAX;
+}
+int main() {
+	cin >> n;
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++)
+			cin >> a[i][j], pre[i][j] = a[i][j] + pre[i][j - 1];
+	}
+	for (int i = 1; i <= n - 1; i++) {
+		for (int j = i + 1; j <= n; j++) { //枚举两列
+			for (int k = 1; k <= n; k++)
+				dp[k] = pre[k][j] - pre[k][i - 1];
+			ans = max(ans, DP());
+		}
+	}
+	cout << ans;
+	return 0;
+}
