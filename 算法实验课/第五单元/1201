@@ -1,0 +1,57 @@
+// P1201
+// Created by LINwhy on 2022/11/18
+// Time 22:33
+// 算法标签 : 差分约束 最长路 无负环
+#include<iostream>
+#include<queue>
+#include<cstring>
+using namespace std;
+const int N = 50005;
+int n, a, b, c;
+int head[N], ver[N << 2], nxt[N << 2], edge[N << 2], tot;
+int vis[N], dist[N];
+queue<int>q;
+void add(int x, int y, int z) {
+	ver[++tot] = y;
+	nxt[tot] = head[x];
+	head[x] = tot;
+	edge[tot] = z;
+}
+//求最长路
+void SPFA() {
+	memset(dist, -0x3f, sizeof dist);
+	dist[0] = 0;
+	vis[0] = 1;
+	q.push(0);
+	while (q.size()) {
+		int x = q.front();
+		q.pop();
+		vis[x] = 0;
+		for (int i = head[x]; i; i = nxt[i]) {
+			int y = ver[i], z = edge[i];
+			if (dist[y] < dist[x] + z) {
+				dist[y] = dist[x] + z;
+				if (!vis[y]) {
+					q.push(y);
+					vis[y] = 1;
+				}
+			}
+		}
+	}
+	cout << dist[50001];
+}
+int main() {
+	cin >> n;
+	for (int i = 1; i <= n; i++) {
+		cin >> a >> b >> c;
+		a++;
+		b++;
+		add(a - 1, b, c);
+	}
+	for (int i = 1; i <= 50001; i++) {
+		add(i - 1, i, 0);
+		add(i, i - 1, -1);
+	}
+	SPFA();
+	return 0;
+}
