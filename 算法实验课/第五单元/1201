@@ -11,14 +11,14 @@ int n, a, b, c;
 int head[N], ver[N << 2], nxt[N << 2], edge[N << 2], tot;
 int vis[N], dist[N];
 queue<int>q;
-void add(int x, int y, int z) {
+void inline add(int x, int y, int z) {
 	ver[++tot] = y;
 	nxt[tot] = head[x];
 	head[x] = tot;
 	edge[tot] = z;
 }
 //求最长路
-void SPFA() {
+void inline SPFA() {
 	memset(dist, -0x3f, sizeof dist);
 	dist[0] = 0;
 	vis[0] = 1;
@@ -41,6 +41,8 @@ void SPFA() {
 	cout << dist[50001];
 }
 int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
 	cin >> n;
 	for (int i = 1; i <= n; i++) {
 		cin >> a >> b >> c;
