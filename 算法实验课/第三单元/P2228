@@ -1,0 +1,36 @@
+// P2228
+// Created by LINwhy on 2022/11/18
+// Time 13:19
+// 标签： 环形结构上的动态规划的优化问题(对应AcWing第288题)
+#include<iostream>
+using namespace std;
+const int N = 4000;
+int n, b;
+long long dp[2][N][2], ui[N], ans;
+int main() {
+	cin >> n >> b;
+	for (int i = 1; i <= n; i++)
+		cin >> ui[i];
+	memset(dp, -0x3f, sizeof dp); //赋值为负无穷 //好诡异 赋值为-1就是错的
+	dp[1][0][0] = dp[1][1][1] = 0;
+	for (int i = 2; i <= n; i++) {
+		for (int j = 0; j <= i && j <= b; j++) {
+			dp[i & 1][j][0] = max(dp[i - 1 & 1][j][0], dp[i - 1 & 1][j][1]);
+			if (j >= 1)
+				dp[i & 1][j][1] = max(dp[i - 1 & 1][j - 1][0], dp[i - 1 & 1][j - 1][1] + ui[i]);
+		}
+	}
+	ans = max(dp[n & 1][b][0], dp[n & 1][b][1]);
+	memset(dp, -0x3f, sizeof dp);
+	dp[1][1][1] = ui[1];
+	for (int i = 2; i <= n; i++) {
+		for (int j = 0; j <= i && j <= b; j++) {
+			dp[i & 1][j][0] = max(dp[i - 1 & 1][j][0], dp[i - 1 & 1][j][1]);
+			if (j >= 1)
+				dp[i & 1][j][1] = max(dp[i - 1 & 1][j - 1][0], dp[i - 1 & 1][j - 1][1] + ui[i]);
+		}
+	}
+	ans = max(ans, dp[n & 1][b][1]);
+	cout << ans << endl;
+	return 0;
+}
