@@ -1,0 +1,122 @@
+// P062
+// Created by LINwhy on 2022/11/18
+// Time 19:28
+//AC版本1 引入超级源点
+#include<iostream>
+#include<cstring>
+#include<queue>
+using namespace std;
+const int N = 105, M = 1e4 + 5, INF = 0x3f3f3f3f;
+int n, diff;
+int head[N], ver[M], nxt[M], edge[M], tot;
+int status[N], vis[N], dis[N];
+priority_queue<pair<int, int> >q;
+int ans = INF;
+void add(int x, int y, int z) {
+	ver[++tot] = y;
+	nxt[tot] = head[x];
+	head[x] = tot;
+	edge[tot] = z;
+}
+void Dijkstra(int l, int r) {
+	memset(dis, 0x3f, sizeof dis);
+	memset(vis, 0, sizeof vis);
+	dis[0] = 0;
+	q.push(make_pair(0, 0));
+	while (q.size()) {
+		int x = q.top().second;
+		q.pop();
+		if (vis[x]) continue;
+		vis[x] = 1;
+		for (int i = head[x]; i; i = nxt[i]) {
+			int y = ver[i], z = edge[i];
+			if (l <= status[y] && status[y] <= r && dis[y] > dis[x] + z) {
+				dis[y] = dis[x] + z;
+				if (!vis[y]) q.push(make_pair(-1 * dis[y], y));
+			}
+		}
+	}
+	ans = min(ans, dis[1]);
+}
+int main() {
+	cin >> diff >> n;
+	for (int i = 1; i <= n; i++) {
+		int p, l, x;
+		cin >> p >> l >> x;
+		status[i] = l;
+		add(0, i, p); //引入超级源点
+		for (int j = 1; j <= x; j++) {
+			int y, z;
+			cin >> y >> z;
+			add(y, i, z); //边反接
+		}
+	}
+	status[0] = status[1];
+	for (int st = status[1] - diff; st <= status[1]; st++) {
+		int l = st, r = st + diff;
+		Dijkstra(l, r);
+	}
+	cout << ans;
+	return 0;
+}
+
+//AC版本2 不引入超级源点
+#include<iostream>
+#include<cstring>
+#include<queue>
+using namespace std;
+const int N = 105, M = 1e4 + 5, INF = 0x3f3f3f3f;
+int n, diff;
+int head[N], ver[M], nxt[M], edge[M], tot;
+int status[N], vis[N], dis[N], w[N];
+priority_queue<pair<int, int> >q;
+int ans = INF;
+void add(int x, int y, int z) {
+	ver[++tot] = y;
+	nxt[tot] = head[x];
+	head[x] = tot;
+	edge[tot] = z;
+}
+void Dijkstra(int l, int r) {
+	memset(dis, 0x3f, sizeof dis);
+	memset(vis, 0, sizeof vis);
+	dis[1] = 0;
+	q.push(make_pair(0, 1));
+	while (q.size()) {
+		int x = q.top().second;
+		q.pop();
+		if (vis[x]) continue;
+		vis[x] = 1;
+		for (int i = head[x]; i; i = nxt[i]) {
+			int y = ver[i], z = edge[i];
+			if (l <= status[y] && status[y] <= r && dis[y] > dis[x] + z) {
+				dis[y] = dis[x] + z;
+				if (!vis[y]) q.push(make_pair(-1 * dis[y], y));
+			}
+		}
+	}
+	for (int i = 1; i <= n; i++) {
+		dis[i] += w[i];
+		ans = min(ans, dis[i]);
+	}
+}
+int main() {
+	cin >> diff >> n;
+	for (int i = 1; i <= n; i++) {
+		int p, l, x;
+		cin >> p >> l >> x;
+		w[i] = p;
+		status[i] = l;
+		for (int j = 1; j <= x; j++) {
+			int y, z;
+			cin >> y >> z;
+			add(i, y, z);
+		}
+	}
+	for (int st = status[1] - diff; st <= status[1]; st++) {
+		int l = st, r = st + diff;
+		Dijkstra(l, r);
+	}
+	cout << ans;
+	return 0;
+}
