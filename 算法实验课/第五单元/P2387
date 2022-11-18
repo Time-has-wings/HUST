@@ -1,0 +1,52 @@
+// P2387
+// Created by LINwhy on 2022/11/18
+// Time 15:29
+//SPFA算法 队列优化的Bellman-Ford算法
+//算法标签 ： 单源最短路径(需要考虑重边)
+#include<iostream>
+#include<queue>
+#include<cstring>
+using namespace std;
+const int M = 2005, N = 1005;
+int head[N], ver[M << 1], nxt[M << 1], edge[M << 1], tot;
+queue<int>q;
+bool v[N];
+int t, n;
+int dis[N];
+void add(int x, int y, int w) {
+	ver[++tot] = y;
+	nxt[tot] = head[x];
+	head[x] = tot;
+	edge[tot] = w;
+}
+
+int main() {
+	cin >> t >> n;
+	for (int i = 1; i <= t; i++) {
+		int x, y, w;
+		cin >> x >> y >> w;
+		add(x, y, w);
+		add(y, x, w);
+	}
+	memset(dis, 0x3f, sizeof dis); //无穷大
+	dis[1] = 0;
+	v[1] = true;
+	q.push(1);
+	while (q.size()) {
+		int x = q.front();
+		q.pop(); 
+		v[x] = false;
+		for (int i = head[x]; i; i = nxt[i]) {
+			int y = ver[i], w = edge[i];
+			if (dis[y] > dis[x] + w) { //三角形不等式
+				dis[y] = dis[x] + w;
+				if (!v[y]) {
+					q.push(y);
+					v[y] = true;
+				}
+			}
+		}
+	}
+	cout << dis[n];
+	return 0;
+}
