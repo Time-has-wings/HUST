@@ -1,0 +1,125 @@
+// P1636
+// Created by LINwhy on 2022/11/18
+// Time 8:51
+// 并查集 连通分量 背包 暴力
+#include<iostream>
+#include<vector>
+#include<set>
+#include<map>
+using namespace std;
+int m, r, T;
+int fa[405], sum1, sum2;
+
+set<int>crime;
+struct node {
+	int first, second;
+	node(int x,int y):first(x),second(y){}
+	bool operator < (const node& a) const {
+		if (first != a.first) return first < a.first;
+		else return second < a.second;
+	}
+};
+map<int, vector<int> >ufs; //Union-find Set
+vector<node>v;
+set<node>s;
+
+
+//初始化部分
+void init(int m) {
+	for (int i = 1; i <= 2 * m; i++)
+		fa[i] = i;
+	sum1 = sum2 = m;
+	ufs.clear();
+	v.clear();
+	s.clear();
+	crime.clear();
+	node tmp(0, 0);
+	s.insert(tmp);
+}
+//并查集部分
+int find(int x) {
+	if (fa[x] == x) return x;
+	else return fa[x] = find(fa[x]);
+}
+void unite(int x, int y) {
+	x = find(x);
+	y = find(y);
+	fa[x] = y;
+}
+
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> T;
+	while (T--) {
+		cin >> m >> r;
+		init(m);
+		for (int i = 1; i <= r; i++) {
+			int x, y;
+			cin >> x >> y;
+			y += m;
+			unite(x, y);
+			crime.insert(x);
+			crime.insert(y);
+		}
+		//扫描参与冲突的犯人 并做好分类
+		set<int>::iterator it = crime.begin();
+		while (it != crime.end()) {
+			int pa = find(*it);
+			ufs[pa].push_back(*it);
+			it++;
+		}
+		//整理连通分量
+		map<int, vector<int> >::iterator it1 = ufs.begin();
+		while (it1 != ufs.end()) {
+			vector<int>& tmp = (*it1).second;
+			int x = 0, y = 0;
+			for (int i = 0; i < tmp.size(); i++) {
+				if (tmp[i] <= m) { x++; sum1--; }
+				else { y++; sum2--; }
+			}
+			node temp(x, y);
+			v.push_back(temp);
+			it1++;
+		}
+		//求解
+		for (int i = 0; i < v.size(); i++) {
+			vector<node>icr;
+			set<node>::iterator it2 = s.begin();
+			while (it2 != s.end()) {
+				int x = v[i].first + (*it2).first, y = v[i].second + (*it2).second;
+				node tmp(x, y);
+				icr.push_back(tmp);
+				it2++;
+			}
+			for (int i = 0; i < icr.size(); i++)
+				s.insert(icr[i]);
+		}
+		//计算结果
+		int ans = 0;
+		//遍历set<node>中的所有元素
+		set<node>::iterator it3 = s.begin();
+		while (it3 != s.end()) {
+			int x = (*it3).first, y = (*it3).second;
+			if (x > m / 2 || y > m / 2) { //有大于的 这个节点作废
+
+			}
+			else { //都小于
+				int MIN = min(x + sum1, y + sum2);
+				if (MIN >= x && MIN >= y) {
+					if (MIN >= m / 2) {
+						ans = m / 2;
+						break;
+					}
+					else ans = max(MIN, ans);
+				}
+				else { //这个时候无法加入
+					 
+				}
+			}
+			it3++;
+		}
+		cout << ans << "\n";
+	}
+	return 0;
+}
