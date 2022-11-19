@@ -1,0 +1,91 @@
+// P1042
+// Created by LINwhy on 2022/11/19
+// Time 22:27
+// 算法标签 ： 枚举 + 贪心 + 排序 
+#include<iostream>
+#include<cstring>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int n, h, f[30], d[30], t[30];
+struct node {
+	int id, cnt;
+	node(int id,int cnt):id(id),cnt(cnt){}
+	bool operator < (const node& a) const {
+		if (cnt != a.cnt) return cnt > a.cnt;
+		else return id < a.id;
+	}
+};
+int main() {
+	scanf("%d", &n);
+	while (n) {
+		cin >> h;
+		for (int i = 1; i <= n; i++)
+			cin >> f[i];
+		for (int i = 1; i <= n; i++)
+			cin >> d[i];
+		for (int i = 1; i <= n - 1; i++)
+			cin >> t[i];
+		int slice = h * 12;//表示共有多少个时段
+		int val[30][200];
+		memset(val, 0, sizeof val);
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= slice; j++) {
+				if (j == 1) val[i][j] = f[i];
+				else {
+					val[i][j] = val[i][j - 1] - d[i];
+					if (val[i][j] < 0) {
+						val[i][j] = 0;
+						break;
+					}
+				}
+			}
+		}
+		int ans[30], MAX = 0;
+		memset(ans, 0, sizeof ans);
+		int idle = slice；
+		vector<node>v;
+		//枚举最后到的湖
+		for (int ed = 1; ed <= n; ed++) {
+			int sum = 0, out[30];
+			memset(out, 0, sizeof out);
+			idle -= t[ed - 1];
+			for (int j = 1; j <= slice; j++) {
+				node tmp(ed, val[ed][j]);
+				v.push_back(tmp);
+			}
+			sort(v.begin(), v.end());
+			for (int i = 0; i < idle; i++) {
+				sum += v[i].cnt;
+				out[v[i].id]++;
+			}
+			if (sum > MAX) { //相等的情况怎么考虑
+				MAX = sum;
+				for (int i = 1; i <= n; i++)
+					ans[i] = out[i];
+			}
+			else if (sum == MAX) {
+				int flag = 0;
+				for (int i = 1; i <= n; i++) {
+					if (ans[i] < out[i]) {
+						flag = 1;
+						break;
+					}
+					else if (ans[i] == out[i]) continue;
+					else break;
+				}
+				if (flag) {
+					for (int i = 1; i <= n; i++)
+						ans[i] = out[i];
+				}
+			}
+		}
+		//输出结果
+		for (int i = 1; i <= n - 1; i++)
+			printf("%d, ", ans[i] * 5);
+		printf("%d\n", ans[n] * 5);
+		printf("Number of fish expected: %d\n\n", MAX);
+		scanf("%d", &n);
+	}
+	return 0;
+}
