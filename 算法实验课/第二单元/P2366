@@ -24,3 +24,40 @@ int main(){
 	else cout<<"NO";
 	return 0;
 } 
+
+//解法二 二分
+#include<iostream>
+using namespace std;
+const int N = 50005;
+int n, m;
+int a[N], flag;
+bool check(int x) {
+	//找是否有这个数字
+	int l = 1, r = n;
+	while (l <= r) {
+		int mid = (l + r) >> 1;
+		if (a[mid] == x) return true;
+		else if (a[mid] < x) l = mid + 1;
+		else r = mid - 1;
+	}
+	return false;
+}
+int main() {
+	//注意加速 或者使用scanf
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		cin >> a[i];
+	cin >> m;
+	for (int i = 1; i <= m; i++) {
+		int x;
+		cin >> x;
+		x = 10000 - x;
+		if (flag) continue;
+		if (check(x)) flag = 1;
+	}
+	if (flag) puts("YES");
+	else puts("NO");
+	return 0;
+}
