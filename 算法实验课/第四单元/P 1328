@@ -1,0 +1,41 @@
+// P1328
+// Created by LINwhy on 2022/11/20
+// Time 0:15
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<vector>
+using namespace std;
+const double eps = 1e-3, INF = 1e10; //注意此处
+typedef pair<double, double> PDD;
+int n, d, T;
+int main() {
+	while (cin >> n >> d, n) {
+		T++;
+		vector<PDD > v;
+		int flag = 0;
+		for (int i = 1; i <= n; i++) {
+			int x, y;
+			cin >> x >> y;
+			if (abs(y) > d) flag = 1;
+			else {
+				double delta = sqrt(d * d - y * y);
+				v.push_back(make_pair(x + delta, x - delta));
+			}
+		}
+		printf("Case %d: ", T);
+		if (flag) cout << "-1\n";
+		else {
+			sort(v.begin(), v.end());
+			double r = -1 * INF;
+			int cnt = 0;
+			for (int i = 0; i < v.size(); i++)
+				if (v[i].second > r + eps) {
+					r = v[i].first;
+					cnt++;
+				}
+			cout << cnt << "\n";
+		}
+	}
+	return 0;
+}
