@@ -1,0 +1,38 @@
+// P3295
+// Created by LINwhy on 2022/11/22
+// Time 22:29
+// 算法标签 ： 枚举 + 递归 / 栈(有点妙)
+#include<iostream>
+#include<string>
+using namespace std;
+//递归求解
+int pos;
+bool recursive(string s, int state) {
+	pos++;
+	if (s[pos] == 'p') return state & 1;
+	else if (s[pos] == 'q') return (state >> 1) & 1;
+	else if (s[pos] == 'r') return (state >> 2) & 1;
+	else if (s[pos] == 's') return (state >> 3) & 1;
+	else if (s[pos] == 't') return (state >> 4) & 1;
+	else if (s[pos] == 'N') return !recursive(s, state);
+	else if (s[pos] == 'K') return recursive(s, state) & recursive(s, state);
+	else if (s[pos] == 'A') return recursive(s, state) | recursive(s, state);
+	else if (s[pos] == 'C') return (!recursive(s, state)) | recursive(s, state);
+	else return recursive(s, state) == recursive(s, state);
+}
+string s;
+int main() {
+	while (cin >> s && s[0] != '0'){
+		int flag = 1;
+		for (int i = 0; i < 32; i++) { //枚举所有可能取值
+			pos = -1;
+			if (!recursive(s, i)) {
+				cout << "not\n";
+				flag = 0;
+				break;
+			}
+		}
+		if (flag) cout << "tautology\n";
+	}
+	return 0;
+}
