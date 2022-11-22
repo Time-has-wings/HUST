@@ -1,0 +1,79 @@
+// P3040
+// Created by LINwhy on 2022/11/22
+// Time 22:28
+// 贪心(能够想到) + 小型模拟
+#include<iostream>
+#include<algorithm>
+using namespace std;
+struct COIN {
+	int val, num;
+	bool operator < (const COIN& x) const {
+		return val < x.val;
+	}
+};
+COIN coin[25];
+int n, c, ans, r;
+int used[25];
+int main() {
+	cin >> n >> c;
+	r = n;
+	for (int i = 1; i <= n; i++)
+		cin >> coin[i].val >> coin[i].num;
+	sort(coin + 1, coin + n + 1);
+	for (int i = n; i >= 1; i--) {
+		if (coin[i].val > c) ans += coin[i].num;
+		else { r = i; break; }
+	}
+	while (true) {
+		int require = c;
+		memset(used, 0, sizeof used);
+		//有大的面额就填入
+		for (int i = r; i >= 1; i--) {
+			int available = min(coin[i].num, require / coin[i].val);
+			used[i] = available;
+			require -= available * coin[i].val;
+			if (require == 0) break; //已经填充完了
+		}
+		//用小的进行填充
+		if (require > 0) { //还需要用小面额的钱进行填充
+			for (int i = 1; i <= r; i++) {
+				if (used[i] < coin[i].num) { //还有多的
+					if ((coin[i].num - used[i]) * coin[i].val < require) { //仅用当前货币填不完
+						require -= (coin[i].num - used[i]) * coin[i].val;
+						used[i] = coin[i].num;
+					}
+					else if ((coin[i].num - used[i]) * coin[i].val == require) { //刚好填完
+						require -= (coin[i].num - used[i]) * coin[i].val;
+						used[i] = coin[i].num;
+						break;//结束
+					}
+					else { //表示可以填完
+						int need = require / coin[i].val;
+						need++;//注意需要加加
+						used[i] += need;
+						require -= need * coin[i].val;
+						break;//结束
+					}
+				}
+			}
+		}
+		if (require > 0) break;	//如果还是填不满 直接结束
+		else { //填满了求解可以通过此方法做多少次
+			int MIN = 1e10;
+			for (int i = 1; i <= n; i++) {
+				if (used[i]) {
+					MIN = min(MIN, coin[i].num / used[i]);
+				}
+			}
+			ans += MIN;
+			//更新现存量
+			for (int i = 1; i <= n; i++) {
+				if (used[i]) {
+					coin[i].num -= used[i] * MIN;
+				}
+			}
+		}
+	}
+	cout << ans;
+	return 0;
+}
