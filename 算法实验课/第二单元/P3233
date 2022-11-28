@@ -1,0 +1,82 @@
+// P3233
+// Created by LINwhy on 2022/11/28
+// Time 16:39
+// 模仿快速幂取模
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int N = 35;
+int n, mod, K;
+int origin[N][N], E[N][N];
+struct MAT {
+	int mat[N][N];
+	MAT() {
+		memset(mat, 0, sizeof mat);
+		for (int i = 1; i <= n; i++)
+			mat[i][i] = 1;
+	}
+	MAT(int a[][N]) {
+		memset(mat, 0, sizeof mat);
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				mat[i][j] = a[i][j];
+	}
+	MAT(const MAT& m) {
+		memset(mat, 0, sizeof mat);
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				mat[i][j] = m.mat[i][j];
+	}
+	MAT operator* (const MAT& m) const {
+		int tmp[N][N];
+		memset(tmp, 0, sizeof tmp);
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				for (int k = 1; k <= n; k++)
+					tmp[i][j] = (tmp[i][j] + mat[i][k] * m.mat[k][j]) % mod;
+		return MAT(tmp);
+	}
+	MAT operator + (const MAT& m)const {
+		int tmp[N][N];
+		memset(tmp, 0, sizeof(tmp));
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				tmp[i][j] = (mat[i][j] + m.mat[i][j]) % mod;
+		return MAT(tmp);
+	}
+	MAT power(int r) const {
+		MAT tmp;
+		MAT m(*this);
+		for (; r; r >>= 1) {
+			if (r & 1) tmp = tmp * m;
+			m = m * m;
+		}
+		return tmp;
+	}
+};
+MAT quick_mod(MAT st, int l, int r) {
+	if (l == r) return st;
+	MAT ans = quick_mod(st, l, r >> 1);
+	MAT e(E);
+	ans = ans * (e + st.power(r >> 1));
+	if (r & 1) ans = ans + st.power(r);
+	return ans;
+}
+int main() {
+	scanf("%d%d%d", &n, &K, &mod);
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= n; j++)
+			scanf("%d", &origin[i][j]);
+	MAT st(origin);
+	//初始化
+	for (int i = 1; i <= n; i++)
+		E[i][i] = 1;
+	MAT ans = quick_mod(st, 1, K);
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+			printf("%d ", ans.mat[i][j]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
