@@ -1,0 +1,107 @@
+// P1860
+// Created by LINwhy on 2022/11/28
+// Time 16:42
+
+//网上搜到的唯一一份可以过的代码
+//用了两次floyd算法求解是否存在正环
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int N = 105;
+int n, m, s;
+double dis[N], rate[N][N], cost[N][N];
+double v;
+bool floyd() {
+	double d[N];
+	for (int i = 1; i <= n; i++)
+		d[i] = dis[i];
+	for (int k = 1; k <= n; k++) {
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= n; j++) {
+				if ((dis[i] - cost[i][j]) * rate[i][j] > dis[j])
+					dis[j] = (dis[i] - cost[i][j]) * rate[i][j];
+			}
+		}
+	}
+	for (int i = 1; i <= n; i++)
+		if (dis[i] > d[i])
+			return true;
+	return false;
+}
+int main() {
+	cin >> n >> m >> s >> v;
+	for (int i = 1; i <= m; i++) {
+		int a, b;
+		double rab, rba, cab, cba;
+		cin >> a >> b >> rab >> cab >> rba >> cba;
+		rate[a][b] = rab;
+		rate[b][a] = rba;
+		cost[a][b] = cab;
+		cost[b][a] = cba;
+	}
+	dis[s] = v;
+	floyd();
+	if (floyd()) puts("YES");
+	else puts("NO");
+	return 0;
+}
+
+//我的代码 在百练和AcWing上可过
+//用spfa算法判正环
+#include<iostream>
+#include<queue>
+#include<cstring>
+
+using namespace std;
+const int N = 105;
+int n, m, s;
+double dis[N], v, rate[N][N], cost[N][N];
+bool vis[N];
+int cnt[N];
+queue<int>q;
+
+//寻找最长路
+bool spfa(int st) {
+	dis[st] = v;
+	q.push(st);
+	vis[st] = true;
+	while (q.size()) {
+		int x = q.front();
+		q.pop();
+		vis[x] = false;
+		for (int i = 1; i <= n; i++) {
+			if (dis[i] < (dis[x] - cost[x][i]) * rate[x][i]) {
+				dis[i] = (dis[x] - cost[x][i]) * rate[x][i];
+				if (dis[st] > v)
+					return true;
+				if (!vis[i]) {
+					cnt[i]++;
+					if (cnt[i] >= N) return true;
+					q.push(i);
+					vis[i] = true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+int main() {
+	scanf("%d %d %d %lf", &n, &m, &s, &v);
+	for (int i = 1; i <= n; i++)
+		rate[i][i] = 1;
+	for (int i = 1; i <= m; i++) {
+		int a, b;
+		double rab, rba, cab, cba;
+		scanf("%d%d%lf%lf%lf%lf", &a, &b, &rab, &cab, &rba, &cba);
+		rate[a][b] = rab;
+		rate[b][a] = rba;
+		cost[a][b] = cab;
+		cost[b][a] = cba;
+	}
+	if (spfa(s))
+		puts("YES");
+	else
+		puts("NO");
+	return 0;
+}
