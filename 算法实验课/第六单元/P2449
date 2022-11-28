@@ -1,0 +1,87 @@
+// P2449
+// Created by LINwhy on 2022/11/28
+// Time 16:47
+// 算法标签 A*算法
+#include<iostream>
+#include<algorithm>
+#include<cstring>
+#include<queue>
+
+using namespace std;
+
+const int N = 1e3 + 5, M = 2e5 + 5;
+int n, m, S, T, K;
+
+int head[N], rhead[N], ver[M], nxt[M], edge[M], tot;
+int f[N], cnt[N];
+bool vis[N];
+
+void add(bool flag, int x, int y, int z) {
+	if (flag) {
+		ver[++tot] = y;
+		nxt[tot] = head[x];
+		edge[tot] = z;
+		head[x] = tot;
+	}
+	else {
+		ver[++tot] = y;
+		nxt[tot] = rhead[x];
+		edge[tot] = z;
+		rhead[x] = tot;
+	}
+}
+
+void Dijkstra() {
+	memset(f, 0x3f, sizeof f);
+	priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > > heap;
+	heap.push(make_pair(0, T));
+	f[T] = 0;
+	while (heap.size()) {
+		pair<int, int> top = heap.top();
+		heap.pop();
+		if (vis[top.second]) continue;
+		vis[top.second] = true;
+		for (int i = rhead[top.second]; i; i = nxt[i]) {
+			int y = ver[i], w = edge[i];
+			if (!vis[y] && f[y] > f[top.second] + w) {
+				f[y] = f[top.second] + w;
+				heap.push(make_pair(f[y], y));
+			}
+		}
+	}
+}
+
+int astar() {
+	priority_queue < pair<int, pair<int, int> >, vector < pair<int, pair<int, int> > >, greater<pair<int, pair<int, int> > > > heap;
+	heap.push(make_pair(f[S], make_pair(0, S)));
+	while (heap.size()) {
+		pair<int, pair<int, int> > top = heap.top();
+		heap.pop();
+		int x = top.second.second, dis = top.second.first;
+		cnt[x]++;
+		if (cnt[T] == K) return dis;
+		if (cnt[x] > K) continue; //注意这条语句
+		for (int i = head[x]; i; i = nxt[i]) {
+			int y = ver[i], w = edge[i];
+			if (cnt[y] < K) {
+				heap.push(make_pair(dis + w + f[y], make_pair(dis + w, y)));
+			}
+		}
+	}
+	return -1;
+}
+
+int main() {
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= m; i++) {
+		int a, b, l;
+		scanf("%d%d%d", &a, &b, &l);
+		add(true, a, b, l);
+		add(false, b, a, l);
+	}
+	scanf("%d%d%d", &S, &T, &K);
+	if (S == T) K++;
+	Dijkstra();
+	cout << astar();
+	return 0;
+}
