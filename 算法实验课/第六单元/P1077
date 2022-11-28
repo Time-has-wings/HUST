@@ -1,0 +1,86 @@
+// P1077
+// Created by LINwhy on 2022/11/28
+// Time 16:49
+// 算法标签 ： A*算法
+#include<iostream>
+#include<cmath>
+#include<string>
+#include<cstring>
+#include<map>
+#include<queue>
+#include<algorithm>
+
+#define x first
+#define y second
+using namespace std;
+string st, seq, c;
+typedef pair<int, string> PIS;
+const int dx[] = { -1,1,0,0 }, dy[] = { 0,0,-1,1 };
+const char op[] = "udlr";
+map<string, pair<string, char> > lst;
+map<string, int >d;
+priority_queue<PIS, vector<PIS >, greater<PIS> >heap;//小根堆
+
+int f(string state) { //估价函数
+	int res = 0;
+	for (int i = 0; i < 9; i++) {
+		if (state[i] != 'x') {
+			int index = state[i] - '1';
+			res = res + abs(index / 3 - i / 3) + abs(index % 3 - i % 3);
+		}
+	}
+	return res;
+}
+
+string bfs(string st) {
+	string ed = "12345678x";
+	heap.push(make_pair(f(st), st));
+	while (heap.size()) {
+		PIS top = heap.top();
+		heap.pop();
+		string now = top.y;
+		if (now == ed) break;
+		int x, y;
+		for (int i = 0; i < 9; i++) {
+			if (now[i] == 'x') {
+				x = i / 3;
+				y = i % 3;
+				break;
+			}
+		}
+		string back_up = now;
+		for (int i = 0; i < 4; i++) {
+			int a = x + dx[i], b = y + dy[i];
+			if (a < 0 || a >= 3 || b < 0 || b >= 3) continue;
+			swap(now[a * 3 + b], now[x * 3 + y]);
+			if (!d.count(now) || d[now] > d[back_up] + 1) {
+				d[now] = d[back_up] + 1;
+				heap.push(make_pair(f(now) + d[now], now));
+				lst[now] = make_pair(back_up, op[i]);
+			}
+			now = back_up;
+		}
+	}
+	string ans;
+	while (ed != st) {
+		ans += lst[ed].y;
+		ed = lst[ed].x;
+	}
+	reverse(ans.begin(), ans.end());
+	return ans;
+}
+int main() {
+	while (cin >> c) {
+		st += c;
+		if (c != "x") seq += c;
+	}
+	int res = 0;//计算逆序对的数量
+	for (int i = 0; i < 8; i++) {
+		for (int j = i; j <= 8; j++)
+			if (seq[i] > seq[j])
+				res++;
+	}
+	if (res & 1) puts("unsolvable");
+	else cout << bfs(st);
+	return 0;
+}
