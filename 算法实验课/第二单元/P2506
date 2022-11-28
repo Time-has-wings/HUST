@@ -1,0 +1,40 @@
+// P2506
+// Created by LINwhy on 2022/11/28
+// Time 16:40
+// 简单的高精度 (注意n为0时，答案是1)
+#include<iostream>
+#include<cstring>
+using namespace std;
+int ans[255][200];
+int main() {
+	ans[1][0] = 1;
+	ans[2][0] = 3;
+	for (int i = 3; i <= 254; i++) {
+		for (int j = 0; j <= 199; j++) {
+			ans[i][j] = ans[i - 1][j] + ans[i - 2][j] * 2;
+		}
+		for (int j = 0; j <= 198; j++) {
+			if (ans[i][j] >= 10) {
+				int carry = ans[i][j] / 10;
+				ans[i][j] -= 10 * carry;
+				ans[i][j + 1] += carry;
+			}
+		}
+	}
+	int n;
+	while (scanf("%d", &n) != EOF) {
+		if (n == 0) cout << "1" << endl;
+		else {
+			int pos = 0;
+			for (int i = 199;; i--)
+				if (ans[n][i] != 0) {
+					pos = i;
+					break;
+				}
+			for (int i = pos; i >= 0; i--)
+				cout << ans[n][i];
+			cout << endl;
+		}
+	}
+	return 0;
+}
